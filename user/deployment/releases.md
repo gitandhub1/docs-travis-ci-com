@@ -6,8 +6,6 @@ layout: en
 
 Travis CI can automatically upload assets from your [`$TRAVIS_BUILD_DIR`](/user/environment-variables/#Default-Environment-Variables) to git tags on your GitHub repository.
 
-**Note that deploying GitHub Releases works only for tags, not for branches.**
-
 For a minimal configuration, add the following to your `.travis.yml`:
 
 ```yaml
@@ -23,7 +21,22 @@ deploy:
 
 > Make sure you have `skip_cleanup` set to `true`, otherwise Travis CI will delete all the files created during the build, which will probably delete what you are trying to upload.
 
-The `on: tags: true` section at the end of the `.travis.yml` above is required to make sure that your tags get deployed.
+> GitHub Releases works with `git` tags.
+> 
+> If there is none for the present commit, one will be created
+> for you, in the form of `untagged-*`, where `*` is a random hex string.
+> 
+> If this is not what you want, we suggest requiring a tag for your deployment with `on.tags: true`,
+> as shown above, or you can tag the present commit with `git tag` in `before_deploy`; for example:
+> 
+    before_deploy:
+      - git tag "$(git branch | grep \* | cut -d ' ' -f2-)-$(git log --format=%h -1)"
+    deploy:
+      provider: releases
+      api_key: "GITHUB OAUTH TOKEN"
+      file: "FILE TO UPLOAD"
+      skip_cleanup: true
+
 
 If you need to overwrite existing files, add `overwrite: true` to the `deploy` section of your `.travis.yml`.
 
@@ -38,17 +51,6 @@ Or, if you're using a private repository:
 ```bash
 travis setup releases --pro
 ```
-
-If you are using the [`branches.only` property](/user/customizing-the-build#Building-Specific-Branches), remember that when you push a tag, the [`$TRAVIS_BRANCH` property](/user/environment-variables/#Default-Environment-Variables) contains the name of the tag. As a result, edit the `branches.only` property to add the names of the tags you might push in the future. You can use a regular expression if you have formalized names. For example, if your release tags look like  `v1.3.15`, use the following configuration: 
-
-```yaml
-   branches:
-    only:
-    - master
-    - /^v\d+(\.\d+)+$/
-```
-
-
 
 ## Authenticating with an OAuth token
 
@@ -125,7 +127,7 @@ includes all files in a given directory.
 ```yaml
 deploy:
   provider: releases
-  api_key: "GITHUB OAUTH TOKEN"
+  api-key: "GITHUB OAUTH TOKEN"
   file_glob: true
   file: directory/*
   skip_cleanup: true
@@ -152,6 +154,11 @@ after_deploy:
   - ./after_deploy_2.sh
 ```
 {: data-file=".travis.yml"}
+
+## Pushing a specific directory
+
+* `local_dir`: Directory to push to GitHub Releases, defaults to the current
+    directory
 
 ## Advanced options
 

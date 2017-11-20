@@ -57,7 +57,6 @@ You can specify your own script to run to install whatever dependencies your pro
 ```yaml
 install: ./install-dependencies.sh
 ```
-{: data-file=".travis.yml"}
 
 > When using custom scripts they should be executable (for example, using `chmod +x`) and contain a valid shebang line such as `/usr/bin/env sh`, `/usr/bin/env ruby`, or `/usr/bin/env python`.
 
@@ -68,7 +67,6 @@ install:
   - bundle install --path vendor/bundle
   - npm install
 ```
-{: data-file=".travis.yml"}
 
 When one of the steps fails, the build stops immediately and is marked as [errored](#Breaking-the-Build).
 
@@ -79,7 +77,6 @@ You can skip the installation step entirely by adding the following to your `.tr
 ```yaml
 install: true
 ```
-{: data-file=".travis.yml"}
 
 ## Customizing the Build Step
 
@@ -90,7 +87,6 @@ You can overwrite the default build step in `.travis.yml`:
 ```yaml
 script: bundle exec thor build
 ```
-{: data-file=".travis.yml"}
 
 You can specify multiple script commands as well:
 
@@ -99,7 +95,6 @@ script:
 - bundle exec rake build
 - bundle exec rake builddoc
 ```
-{: data-file=".travis.yml"}
 
 When one of the build commands returns a non-zero exit code, the Travis CI build runs the subsequent commands as well, and accumulates the build result.
 
@@ -112,7 +107,6 @@ You can change this behavior by using a little bit of shell magic to run all com
 ```yaml
 script: bundle exec rake build && bundle exec rake builddoc
 ```
-{: data-file=".travis.yml"}
 
 This example (note the `&&`) fails immediately when `bundle exec rake build` fails.
 
@@ -150,7 +144,6 @@ working directory and deleting all changes made during the build ( `git stash
 deploy:
   skip_cleanup: true
 ```
-{: data-file=".travis.yml"}
 
 You can run steps before a deploy by using the `before_deploy` phase. A non-zero exit code in this phase will mark the build as **errored**.
 
@@ -171,7 +164,6 @@ before_install:
 - sudo apt-get update -qq
 - sudo apt-get install -qq [packages list]
 ```
-{: data-file=".travis.yml"}
 
 > Note that this feature is not available for builds that are running on [Container-based workers](/user/reference/overview/#Virtualization-environments).
 > Look into [using the `apt` plug-in](/user/installing-dependencies/#Installing-Packages-on-Container-Based-Infrastructure) instead.
@@ -190,7 +182,6 @@ If you need to install a second programming language in your current build envir
 before_install:
 - rvm install 2.1.5
 ```
-{: data-file=".travis.yml"}
 
 You can also use other installation methods such as `apt-get`.
 
@@ -201,7 +192,8 @@ Travis CI has specific time limits for each job, and will stop the build and add
 
 - A job produces no log output for 10 minutes
 - A job on travis-ci.org takes longer than 50 minutes
-- A job on travis-ci.com takes longer than 120 minutes
+- A job running on OS X infrastructure takes longer than 50 minutes (applies to travis-ci.org or travis-ci.com)
+- A job on Linux infrastructure on travis-ci.com takes longer than 120 minutes
 
 Some common reasons why builds might hang:
 
@@ -211,15 +203,15 @@ Some common reasons why builds might hang:
 
 > There is no timeout for a build; a build will run as long as all the jobs do as long as each job does not timeout.
 
-## Limiting Concurrent Jobs
+## Limiting Concurrent Builds
 
-The maximum number of concurrent jobs depends on the total system load, but
+The maximum number of concurrent builds depends on the total system load, but
 one situation in which you might want to set a particular limit is:
 
 - if your build depends on an external resource and might run into a race
-  condition with concurrent jobs.
+  condition with concurrent builds.
 
-You can set the maximum number of concurrent jobs in the settings pane for
+You can set the maximum number of concurrent builds in the settings pane for
 each repository.
 
 ![Settings -> Limit concurrent builds](/images/screenshots/concurrent-builds-how-to.png)
@@ -259,7 +251,6 @@ You can set the [clone depth](http://git-scm.com/docs/git-clone) in `.travis.yml
 git:
   depth: 3
 ```
-{: data-file=".travis.yml"}
 
 ## Git Submodules
 
@@ -269,54 +260,28 @@ Travis CI clones git submodules by default, to avoid this set:
 git:
   submodules: false
 ```
-{: data-file=".travis.yml"}
 
-## Git LFS
+## Git LFS Skip Smudge
 
-
-### Authentication
-
-We recommend using a read-only GitHub OAuth token to authenticate when using git LFS:
-
-```
-before_install:
-- echo -e "machine github.com\n  login $GITHUB_TOKEN" >> ~/.netrc
-- git lfs pull
-```
-
-This authentication is required when connecting to private repositories, and prevents rate-limiting when connecting to open source repositories.
-
-Deploy keys are not currently supported by LFS, so you should use a GitHub OAuth token to authenticate as in the example above.
-
-
-### Linux
-
-[Git LFS](https://git-lfs.github.com/) is supported by default on our Ubuntu Trusty images.
-
-### Mac OS
-
-Installing git-lfs via brew is the recommended way to get Git LFS in [Mac OS](/user/reference/osx/).
-
-```
-os: osx
-
-before_install:
-- brew install git-lfs
-
-before_script:
-- git lfs pull
-```
-
-### Git LFS Skip Smudge
-
-GitHub rate-limits the Git-LFS requests during the git clone process. If you run into rate-limiting issues, you can skip fetching the git-lfs files during the initial `git clone` (equivalent to [`git lfs smudge --skip`](https://github.com/git-lfs/git-lfs/blob/master/docs/man/git-lfs-smudge.1.ronn)), and download these assets during the `before_install` phase of your build. To achieve this, you can use the following configuration in `.travis.yml`:
+You can disable the download of LFS objects when cloning ([`git lfs smudge
+--skip`](https://github.com/git-lfs/git-lfs/blob/master/docs/man/git-lfs-smudge.1.ronn))
+by setting the following in `.travis.yml`:
 
 ```yaml
 git:
   lfs_skip_smudge: true
 ```
-{: data-file=".travis.yml"}
 
+## Git Sparse Checkout
+Travis CI supports `git`'s [sparse checkout](https://git-scm.com/docs/git-read-tree#_sparse_checkout)
+capability.
+To clone your repository sparsely, add:
+```yaml
+git:
+  sparse_checkout: skip-worktree-map-file
+```
+where `skip-worktree-map-file` is the file containing the list of files which should be populated
+"sparsely".
 
 ## Building Specific Branches
 
@@ -339,7 +304,6 @@ branches:
   - master
   - stable
 ```
-{: data-file=".travis.yml"}
 
 > Note that safelisting also prevents tagged commits from being built. If you consistently tag your builds in the format `v1.3` you can safelist them all with [regular expressions](#Using-regular-expressions), for example `/^v\d+\.\d+(\.\d+)?(-\S*)?$/`.
 
@@ -353,7 +317,6 @@ branches:
   - gh-pages
   - /.*/
 ```
-{: data-file=".travis.yml"}
 
 > Note that for historical reasons `.travis.yml` needs to be present *on all active branches* of your project.
 
@@ -367,7 +330,6 @@ branches:
   - master
   - /^deploy-.*$/
 ```
-{: data-file=".travis.yml"}
 
 Any name surrounded with `/` in the list of branches is treated as a regular expression and can contain any quantifiers, anchors or character classes supported by [Ruby regular expressions](http://www.ruby-doc.org/core-1.9.3/Regexp.html).
 
@@ -393,7 +355,7 @@ rvm:
   - 2.2
   - ruby-head
   - jruby
-  - rbx-3
+  - rbx-2
   - ree
 gemfile:
   - gemfiles/Gemfile.rails-2.3.x
@@ -404,7 +366,6 @@ env:
   - ISOLATED=true
   - ISOLATED=false
 ```
-{: data-file=".travis.yml"}
 
 You can also define exclusions to the build matrix:
 
@@ -418,7 +379,6 @@ matrix:
     gemfile: gemfiles/Gemfile.rails-2.3.x
     env: ISOLATED=true
 ```
-{: data-file=".travis.yml"}
 
 > All build matrixes are currently limited to a maximum of **200 jobs** for both private and public repositories. If you are on an open-source plan, please remember that Travis CI provides this service free of charge to the community. So please only specify the matrix you *actually need*.
 
@@ -445,7 +405,6 @@ gemfile:
 - gemfiles/rails31.gemfile
 - gemfiles/rails32.gemfile
 ```
-{: data-file=".travis.yml"}
 
 This results in a 3×3×4 build matrix. To exclude all jobs which have `rvm` value `2.0.0` *and*
 `gemfile` value `Gemfile`, you can write:
@@ -456,7 +415,6 @@ matrix:
   - rvm: 2.0.0
     gemfile: Gemfile
 ```
-{: data-file=".travis.yml"}
 
 Which is equivalent to:
 
@@ -473,7 +431,6 @@ matrix:
     gemfile: Gemfile
     env: DB=mysql
 ```
-{: data-file=".travis.yml"}
 
 ### Explicitly Including Jobs
 
@@ -486,7 +443,6 @@ matrix:
     gemfile: gemfiles/Gemfile.rails-3.2.x
     env: ISOLATED=false
 ```
-{: data-file=".travis.yml"}
 
 This adds a particular job to the build matrix which has already been populated.
 
@@ -507,7 +463,6 @@ matrix:
     env: TEST_SUITE=suite_pypy
 script: ./test.py $TEST_SUITE
 ```
-{: data-file=".travis.yml"}
 
 creates a build matrix with 3 jobs, which runs test suite for each version
 of Python.
@@ -535,7 +490,6 @@ matrix:
       env: EXTRA_TESTS=true
 script: env $EXTRA_TESTS ./test.py $TEST_SUITE
 ```
-{: data-file=".travis.yml"}
 
 ### Rows that are Allowed to Fail
 
@@ -552,7 +506,6 @@ matrix:
   allow_failures:
   - rvm: 1.9.3
 ```
-{: data-file=".travis.yml"}
 
 #### Matching Jobs with `allow_failures`
 
@@ -582,7 +535,6 @@ matrix:
   allow_failures:
     - env: SECRET_VAR1=SECRET1 SECRET_VAR2=SECRET2
 ```
-{: data-file=".travis.yml"}
 
 Here, no job is allowed to fail because no job has the `env` value
 `SECRET_VAR1=SECRET1 SECRET_VAR2=SECRET2`.
@@ -603,7 +555,6 @@ matrix:
   - php: 7.0
     env: KEY=VALUE
 ```
-{: data-file=".travis.yml"}
 
 Without the top-level `env`, no job will be allowed to fail.
 
@@ -617,7 +568,6 @@ To mark the build as finished as soon as possible, add `fast_finish: true` to th
 matrix:
   fast_finish: true
 ```
-{: data-file=".travis.yml"}
 
 Now, the build result will be determined as soon as all the required jobs finish, based on these results, while the rest of the `allow_failures` jobs continue to run.
 
@@ -633,7 +583,7 @@ Consider a scenario where you want to run more complex test scenarios, but only 
 set -ev
 bundle exec rake:units
 if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
-  bundle exec rake test:integration
+	bundle exec rake test:integration
 fi
 ```
 
@@ -646,7 +596,6 @@ Assuming the script above is stored as `scripts/run-tests.sh` in your repository
 ```yaml
 script: ./scripts/run-tests.sh
 ```
-{: data-file=".travis.yml"}
 
 ### How does this work? (Or, why you should not use `exit` in build steps)
 
@@ -670,7 +619,6 @@ addons:
   - travis.dev
   - joshkalderimis.com
 ```
-{: data-file=".travis.yml"}
 
 ## What repository providers or version control systems can I use?
 

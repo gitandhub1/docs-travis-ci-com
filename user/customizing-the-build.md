@@ -253,6 +253,14 @@ git:
   depth: 3
 ```
 
+You can also remove the `--depth` flag entirely with:
+
+```yaml
+git:
+  depth: false
+```
+{: data-file=".travis.yml"}
+
 ## Git Submodules
 
 Travis CI clones git submodules by default, to avoid this set:

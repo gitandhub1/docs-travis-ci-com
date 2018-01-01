@@ -624,7 +624,7 @@ hostnames in `/etc/hosts` for both IPv4 and IPv6.
 ```yaml
 addons:
   hosts:
-  - travis.dev
+  - travis.test
   - joshkalderimis.com
 ```
 

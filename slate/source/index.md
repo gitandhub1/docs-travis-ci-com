@@ -1,5 +1,5 @@
 ---
-title: Travis CI - API Reference
+title: Travis CI - API V2 Reference
 
 language_tabs:
 - http
@@ -458,7 +458,7 @@ A user might have access to multiple accounts. This is usually the account corre
 ### Attributes
 
 | Attribute   | Description                                         |
-| ----------- | --------------------------------------------------- |
+|:------------|:----------------------------------------------------|
 | id          | user or organization id                             |
 | name        | account name on GitHub                              |
 | login       | account login on GitHub                             |
@@ -473,7 +473,7 @@ The `subscribed` attribute is only available on Travis Pro.
 `GET /accounts`
 
 | Parameter | Default | Description                                                               |
-| --------- | ------- | ------------------------------------------------------------------------- |
+|:----------|:--------|:--------------------------------------------------------------------------|
 | all       | false   | whether or not to include accounts the user does not have admin access to |
 
 This request always needs to be authenticated.
@@ -592,7 +592,7 @@ end
 ### Attributes
 
 | Attribute | Description       |
-| --------- | ----------------- |
+|:----------|:------------------|
 | id        | broadcast id      |
 | message   | broadcast message |
 
@@ -663,7 +663,7 @@ end
 ### Attributes
 
 | Attribute           | Description                                      |
-| ------------------- | ------------------------------------------------ |
+|:--------------------|:-------------------------------------------------|
 | id                  | build id                                         |
 | repository_id       | repository id                                    |
 | commit_id           | commit id                                        |
@@ -685,7 +685,7 @@ Note that `duration` might not correspond to `finished_at - started_at` if the b
 `GET /builds`
 
 | Parameter     | Default | Description                                                                                |
-| ------------- | ------- | ------------------------------------------------------------------------------------------ |
+|:--------------|:--------|:-------------------------------------------------------------------------------------------|
 | ids           |         | list of build ids to fetch                                                                 |
 | repository_id |         | repository id the build belongs to                                                         |
 | slug          |         | repository slug the build belongs to                                                       |
@@ -698,7 +698,7 @@ You have to supply either `ids`, `repository_id` or `slug`.
 `GET /repos/{repository.id}/builds`
 
 | Parameter    | Default | Description                                                |
-| ------------ | ------- | ---------------------------------------------------------- |
+|:-------------|:--------|:-----------------------------------------------------------|
 | number       |         | filter by build number                                     |
 | after_number |         | list build after a given build number (use for pagination) |
 | event_type   |         | limit build to given event type (`push` or `pull_request`) |
@@ -706,7 +706,7 @@ You have to supply either `ids`, `repository_id` or `slug`.
 `GET /repos/{+repository.slug}/builds`
 
 | Parameter    | Default | Description                                                |
-| ------------ | ------- | ---------------------------------------------------------- |
+|:-------------|:--------|:-----------------------------------------------------------|
 | number       |         | filter by build number                                     |
 | after_number |         | list build after a given build number (use for pagination) |
 | event_type   |         | limit build to given event type (`push` or `pull_request`) |
@@ -788,7 +788,7 @@ repository.delete_caches(branch: 'mm-ruby-2.1')
 ### Attributes
 
 | Attribute     | Description                               |
-| ------------- | ----------------------------------------- |
+|:--------------|:------------------------------------------|
 | repository_id | id of the repository the cache belongs to |
 | size          | compressed cache size in bytes            |
 | slug          | cache slug (generated from env)           |
@@ -802,7 +802,7 @@ repository.delete_caches(branch: 'mm-ruby-2.1')
 `GET /repos/{+repository.slug}/caches`
 
 | Parameter | Default | Description                                                         |
-| --------- | ------- | ------------------------------------------------------------------- |
+|:----------|:--------|:--------------------------------------------------------------------|
 | branch    |         | limit listed caches to those on given branch                        |
 | match     |         | limit listed caches to those with `slug` containing the given value |
 
@@ -815,7 +815,7 @@ This request always needs to be authenticated.
 `DELETE /repos/{+repository.slug}/caches`
 
 | Parameter | Default | Description                                               |
-| --------- | ------- | --------------------------------------------------------- |
+|:----------|:--------|:----------------------------------------------------------|
 | branch    |         | only delete caches on given branch                        |
 | match     |         | only delete caches with `slug` containing the given value |
 
@@ -875,7 +875,7 @@ There is no API endpoint for resolving commits, however commit data might be inc
 ### Attributes
 
 | Attribute       | Description             |
-| --------------- | ----------------------- |
+|:----------------|:------------------------|
 | id              | commit id               |
 | sha             | commit sha              |
 | branch          | branch the commit is on |
@@ -930,14 +930,14 @@ This request always needs to be authenticated.
 `PUT /hooks`
 
 | Parameter    | Default | Description                                   |
-| ------------ | ------- | --------------------------------------------- |
+|:-------------|:--------|:----------------------------------------------|
 | hook[id]     |         | id of the hook/repository                     |
 | hook[active] | false   | whether to turn hook on (true) or off (false) |
 
 `PUT /hooks/{hook.id}`
 
 | Parameter    | Default | Description                                   |
-| ------------ | ------- | --------------------------------------------- |
+|:-------------|:--------|:----------------------------------------------|
 | hook[active] | false   | whether to turn hook on (true) or off (false) |
 
 This request always needs to be authenticated.
@@ -967,21 +967,21 @@ end
 
 ### Attributes
 
-| Attribute      | Description                                     |
-| -------------- | ----------------------------------------------- |
-| id             | job id                                          |
-| build_id       | build id                                        |
-| repository_id  | repository id                                   |
-| commit_id      | commit id                                       |
-| log_id         | log id                                          |
-| number         | job number                                      |
-| config         | job config (secure values and ssh key removed)  |
-| state          | job state                                       |
-| started_at     | time the job was started                        |
-| finished_at    | time the job finished                           |
-| duration       | job duration                                    |
-| queue          | job queue                                       |
-| allow_failure  | whether or not job state influences build state |
+| Attribute     | Description                                     |
+|:--------------|:------------------------------------------------|
+| id            | job id                                          |
+| build_id      | build id                                        |
+| repository_id | repository id                                   |
+| commit_id     | commit id                                       |
+| log_id        | log id                                          |
+| number        | job number                                      |
+| config        | job config (secure values and ssh key removed)  |
+| state         | job state                                       |
+| started_at    | time the job was started                        |
+| finished_at   | time the job finished                           |
+| duration      | job duration                                    |
+| queue         | job queue                                       |
+| allow_failure | whether or not job state influences build state |
 
 ### Fetch Job
 
@@ -992,7 +992,7 @@ end
 <aside class='notice'>Job entities are included in build payloads.</aside>
 
 | Parameter | Default | Description            |
-| --------- | ------- | ---------------------- |
+|:----------|:--------|:-----------------------|
 | ids       |         | list of job ids        |
 | state     |         | job state to filter by |
 | queue     |         | job queue to filter by |
@@ -1048,7 +1048,7 @@ end
 ### Attributes
 
 | Attribute | Description |
-| --------- | ----------- |
+|:----------|:------------|
 | id        | log id      |
 | job_id    | job id      |
 | body      | log body    |
@@ -1058,7 +1058,7 @@ end
 You can retrieve the chunked attributes instead of the normal attributes b adding the attribute `chunked=true` to the mime-type specified in the `Accept` header.
 
 | Attribute | Description |
-| --------- | ----------- |
+|:----------|:------------|
 | id        | log id      |
 | job_id    | job id      |
 | parts     | log parts   |
@@ -1066,7 +1066,7 @@ You can retrieve the chunked attributes instead of the normal attributes b addin
 The `parts` will be an array of JSON objects with the following attributes:
 
 | Attribute | Description  |
-| --------- | ------------ |
+|:----------|:-------------|
 | number    | part number  |
 | content   | part content |
 
@@ -1124,7 +1124,7 @@ end
 The permissions endpoint will return arrays of repository ids:
 
 | Key         | ids for                                   |
-| ----------- | ----------------------------------------- |
+|:------------|:------------------------------------------|
 | permissions | repositories the user has access to       |
 | admin       | repositories the user has admin access to |
 | pull        | repositories the user has pull access to  |
@@ -1185,7 +1185,7 @@ puts repository.encrypt("example")
 ```
 
 | Attribute   | Description                    |
-| ----------- | ------------------------------ |
+|:------------|:-------------------------------|
 | key         | public key                     |
 | fingerprint | fingerprint for the public key |
 
@@ -1253,7 +1253,7 @@ end
 ### Attributes
 
 | Attribute              | Description                         |
-| ---------------------- | ----------------------------------- |
+|:-----------------------|:------------------------------------|
 | id                     | repository id                       |
 | slug                   | repository slug                     |
 | description            | description on github               |
@@ -1274,7 +1274,7 @@ end
 ### Find Repositories
 
 | Parameter  | Default | Description                                                               |
-| ---------- | ------- | ------------------------------------------------------------------------- |
+|:-----------|:--------|:--------------------------------------------------------------------------|
 | ids        |         | list of repository ids to fetch, cannot be combined with other parameters |
 | member     |         | filter by user that has access to it (github login)                       |
 | owner_name |         | filter by owner name (first segment of slug)                              |
@@ -1344,7 +1344,7 @@ Requests can be used to see if and why a GitHub even has or has not triggered a 
 ### Attributes
 
 | Attribute           | Description                                                   |
-| ------------------- | ------------------------------------------------------------- |
+|:--------------------|:--------------------------------------------------------------|
 | id                  | request id                                                    |
 | commit_id           | commit id                                                     |
 | repository_id       | repository id                                                 |
@@ -1371,7 +1371,7 @@ Requests can be used to see if and why a GitHub even has or has not triggered a 
 `GET /requests`
 
 | Parameter     | Default | Description                                                              |
-| ------------- | ------- | ------------------------------------------------------------------------ |
+|:--------------|:--------|:-------------------------------------------------------------------------|
 | repository_id |         | repository id the requests belong to                                     |
 | slug          |         | repository slug the requests belong to                                   |
 | limit         | 25      | maximum number of requests to return (cannot be larger than 100)         |
@@ -1425,7 +1425,7 @@ repo.settings.save
 ### Attributes
 
 | Attribute                   | Description                                                |
-| --------------------------- | ---------------------------------------------------------- |
+|:----------------------------|:-----------------------------------------------------------|
 | builds_only_with_travis_yml | "builds only with .travis.yml" setting (`true` or `false`) |
 | build_pushes                | "build pushes" setting (`true` or `false`)                 |
 | build_pull_requests         | "build pull requests" setting (`true` or `false`)          |
@@ -1442,7 +1442,7 @@ This request always needs to be authenticated.
 `PATCH /repos/{repository.id}/settings`
 
 | Parameter | Default | Description                                                                       |
-| --------- | ------- | --------------------------------------------------------------------------------- |
+|:----------|:--------|:----------------------------------------------------------------------------------|
 | settings  | `{}`    | Hash map of settings that should be updated and their new values (see Attributes) |
 
 This request always needs to be authenticated.
@@ -1496,7 +1496,7 @@ repo.env_vars['foo'] = bar
 ### Attributes
 
 | Attribute     | Description                                               |
-| ------------- | --------------------------------------------------------- |
+|:--------------|:----------------------------------------------------------|
 | id            | env var id                                                |
 | repository_id | repository id                                             |
 | name          | env var name (exported)                                   |
@@ -1520,7 +1520,7 @@ This request always needs to be authenticated.
 `POST /repos/settings/env_vars?repository_id={repository.id}`
 
 | Parameter      | Default | Description                              |
-| -------------- | ------- | ---------------------------------------- |
+|:---------------|:--------|:-----------------------------------------|
 | env_var        |         | Hash map of env var variable (see below) |
 | env_var.name   |         | Name of the new env var (string)         |
 | env_var.value  |         | Value of the new env var (string)        |
@@ -1533,7 +1533,7 @@ This request always needs to be authenticated.
 `PATCH /repos/settings/env_vars/{env_var.id}`
 
 | Parameter      | Default       | Description                              |
-| -------------- | ------------- | ---------------------------------------- |
+|:---------------|:--------------|:-----------------------------------------|
 | env_var        |               | Hash map of env var variable (see below) |
 | env_var.name   | current value | Name of the new env var (string)         |
 | env_var.value  | current value | Value of the new env var (string)        |
@@ -1587,7 +1587,7 @@ puts Travis::Pro::Repository.find('my/repo').ssh_key.description
 ### Attributes
 
 | Attribute   | Description                               |
-| ----------- | ----------------------------------------- |
+|:------------|:------------------------------------------|
 | id          | ssh key id (corresponds to repository id) |
 | description | key description                           |
 | fingerprint | key fingerprint                           |
@@ -1603,7 +1603,7 @@ This request always needs to be authenticated.
 `PATCH /settings/ssh_key/#{ssh_key.id}`
 
 | Parameter           | Default                | Description                          |
-| ------------------- | ---------------------- | ------------------------------------ |
+|:--------------------|:-----------------------|:-------------------------------------|
 | ssh_key             |                        | Hash map of ssh key data (see below) |
 | ssh_key.description | current value or empty | key description                      |
 | ssh_key.value       |                        | private key (required)               |
@@ -1663,7 +1663,7 @@ Travis.user.sync
 ### Attributes
 
 | Attribute      | Description                                           |
-| -------------- | ----------------------------------------------------- |
+|:---------------|:------------------------------------------------------|
 | id             | user id                                               |
 | login          | user login on github                                  |
 | name           | user name  on github                                  |
@@ -1743,7 +1743,7 @@ end
 `POST /lint`
 
 | Parameter | Default | Description                  |
-| --------- | ------- | ---------------------------- |
+|:----------|:--------|:-----------------------------|
 | content   |         | content of the `.travis.yml` |
 
 `PUT /lint`

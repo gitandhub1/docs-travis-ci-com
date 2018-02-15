@@ -398,7 +398,7 @@ Some client libraries will automate this handshake for you.
 </script>
 ```
 
-You can also trigger a full OAuth handshake between Travis CI and GitHub by opening `/auth/handshake` in a web browser. The endpoint takes an optional `redirect_to` query parameter, which takes a URL the web browser will end up on if the handshake is successful.
+You can also trigger a full OAuth handshake between Travis CI and GitHub by opening `/auth/handshake` in a web browser. The endpoint takes an optional `redirect_uri` query parameter, which takes a URL the web browser will end up on if the handshake is successful.
 
 There is an alternative version of this that will try to run the handshake in a hidden iframe and using `window.postMessage` to hand the token to the website embedding the iframe. **This endpoint will only work for whitelisted websites.**
 
@@ -734,7 +734,7 @@ This request always needs to be authenticated.
 ## Caches
 
 ```http
-GET /repos/travis-pro/billing/builds HTTP/1.1
+GET /repos/travis-pro/billing/caches HTTP/1.1
 User-Agent: MyClient/1.0.0
 Accept: application/vnd.travis-ci.2+json
 Authorization: token YOUR TRAVIS ACCESS TOKEN
@@ -979,7 +979,6 @@ end
 | state         | job state                                       |
 | started_at    | time the job was started                        |
 | finished_at   | time the job finished                           |
-| duration      | job duration                                    |
 | queue         | job queue                                       |
 | allow_failure | whether or not job state influences build state |
 
@@ -1015,7 +1014,7 @@ This request always needs to be authenticated.
 ## Logs
 
 ```http
-GET /jobs/42/logs HTTP/1.1
+GET /jobs/42/log HTTP/1.1
 User-Agent: MyClient/1.0.0
 Accept: text/plain
 Host: api.travis-ci.org
@@ -1055,7 +1054,7 @@ end
 
 ### Chunked Attributes
 
-You can retrieve the chunked attributes instead of the normal attributes b adding the attribute `chunked=true` to the mime-type specified in the `Accept` header.
+You can retrieve the chunked attributes instead of the normal attributes by adding the attribute `chunked=true` to the mime-type specified in the `Accept` header.
 
 | Attribute | Description |
 |:----------|:------------|
@@ -1153,7 +1152,7 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "public_key": "-----BEGIN RSA PUBLIC KEY-----\\nMIGJAoGBAOcx131amMqIzm5+FbZz+DhIgSDbFzjKKpzaN5UWVCrLSc57z64xxTV6\\nkaOTZmjCWz6WpaPkFZY+czfL7lmuZ/Y6UNm0vupvdZ6t27SytFFGd1/RJlAe89tu\\nGcIrC1vtEvQu2frMLvHqFylnGd5Gy64qkQT4KRhMsfZctX4z5VzTAgMBAAE=\\n-----END RSA PUBLIC KEY-----\\n",
+  "key": "-----BEGIN RSA PUBLIC KEY-----\\nMIGJAoGBAOcx131amMqIzm5+FbZz+DhIgSDbFzjKKpzaN5UWVCrLSc57z64xxTV6\\nkaOTZmjCWz6WpaPkFZY+czfL7lmuZ/Y6UNm0vupvdZ6t27SytFFGd1/RJlAe89tu\\nGcIrC1vtEvQu2frMLvHqFylnGd5Gy64qkQT4KRhMsfZctX4z5VzTAgMBAAE=\\n-----END RSA PUBLIC KEY-----\\n",
   "fingerprint": "ef:39:56:6e:2a:09:a2:10:2e:b5:39:ac:3d:3e:e1:05"
 }
 ```
@@ -1339,7 +1338,7 @@ Travis::Repository.find('sinatra/sinatra').requests.each do |request|
 end
 ```
 
-Requests can be used to see if and why a GitHub even has or has not triggered a new build.
+Requests can be used to see if and why a GitHub event has or has not triggered a new build.
 
 ### Attributes
 

@@ -12,24 +12,10 @@ def print_line_containing(file, str)
   File.open(file).grep(/#{str}/).each { |line| puts "#{file}: #{line}" }
 end
 
-def dns_resolve(hostname, rectype: 'A')
+def dns_txt(hostname, record: 0)
   JSON.parse(
-    Faraday.get("https://dnsjson.com/#{hostname}/#{rectype}.json").body
-  ).fetch('results').fetch('records')
-end
-
-def define_ip_range(nat_hostname, dest)
-  data = dns_resolve(nat_hostname)
-
-  File.write(
-    dest,
-    YAML.dump(
-      'host' => nat_hostname,
-      'ip_range' => data.sort { |a, b| IPAddr.new(a) <=> IPAddr.new(b) }
-    )
-  )
-
-  puts "Updated #{dest}"
+    Faraday.get("https://dnsjson.com/#{hostname}/TXT.json").body
+  ).fetch('results').fetch('records').fetch(record).split.map(&:strip)
 end
 
 task default: :test
@@ -141,40 +127,87 @@ file '_data/trusty_language_mapping.yml' => [
   puts "Updated #{t.name}"
 end
 
-file '_data/ip_range.yml' do |t|
-  define_ip_range('nat.travisci.net', t.name)
+file '_data/ec2-public-ips.json' do |t|
+  source = File.join(
+    'https://raw.githubusercontent.com',
+    'travis-infrastructure/terraform-config/master/aws-shared-2',
+    'generated-public-ip-addresses.json'
+  )
+
+  File.write(t.name, Faraday.get(source).body)
 end
 
-file '_data/ec2_ip_range.yml' do |t|
-  define_ip_range('nat.aws-us-east-1.travisci.net', t.name)
+file '_data/ec2_public_ips.yml' => '_data/ec2-public-ips.json' do |t|
+  data = JSON.parse(File.read('_data/ec2-public-ips.json'))
+  by_site = %w[com org].map do |site|
+    [
+      site,
+      data['ips_by_host'].find { |d| d['host'] =~ /-#{site}-/ }
+    ]
+  end
+
+  File.write(t.name, YAML.dump(by_site.to_h))
+
+  puts "Updated #{t.name}"
 end
 
 file '_data/gce_ip_range.yml' do |t|
-  define_ip_range('nat.gce-us-central1.travisci.net', t.name)
+  # Using steps described in:
+  # https://cloud.google.com/compute/docs/faq#where_can_i_find_short_product_name_ip_ranges
+  # we populate the range of IP addresses for GCE instances
+  dns_root = ENV.fetch(
+    'GOOGLE_DNS_ROOT', '_cloud-netblocks.googleusercontent.com'
+  )
+
+  blocks = dns_txt(dns_root).grep(/^include:/).map do |bl|
+    dns_txt(bl.sub(/^include:/, '')).grep(/^ip4:/)
+                                    .map { |l| l.sub(/^ip4:/, '') }
+  end
+
+  File.write(
+    t.name,
+    YAML.dump(
+      'ip_ranges' => blocks.flatten
+                           .compact
+                           .sort { |a, b| IPAddr.new(a) <=> IPAddr.new(b) }
+    )
+  )
+
+  puts "Updated #{t.name}"
 end
 
-file '_data/macstadium_ip_range.yml' do |t|
-  define_ip_range('nat.macstadium-us-se-1.travisci.net', t.name)
+file '_data/node_js_versions.yml' do |t|
+  remote_node_versions = `bash -l -c "nvm ls-remote"`.split("\n").
+    map {|l| l.gsub(/.*v(0\.[1-9][0-9]*|[1-9]*)\..*$/, '\1')}.uniq.
+    sort {|a,b| Gem::Version.new(b) <=> Gem::Version.new(a) }
+
+  File.write(
+    t.name,
+    YAML.dump(
+      remote_node_versions.flatten.compact.take(5)
+    )
+  )
+  puts "Updated #{t.name}"
 end
 
 desc 'Refresh generated files'
-task regen: (%i[clean] + %w[
-  _data/ec2_ip_range.yml
-  _data/gce_ip_range.yml
-  _data/ip_range.yml
-  _data/macstadium_ip_range.yml
-  _data/trusty_language_mapping.yml
-])
+task regen: [
+  :clean,
+  '_data/ec2_public_ips.yml',
+  '_data/gce_ip_range.yml',
+  '_data/trusty_language_mapping.yml',
+  '_data/node_js_versions.yml'
+]
 
 desc 'Remove generated files'
 task :clean do
   rm_f(%w[
-         _data/ec2_ip_range.yml
+         _data/ec2_public_ips.yml
+         _data/ec2-public-ips.json
          _data/gce_ip_range.yml
-         _data/ip_range.yml
-         _data/macstadium_ip_range.yml
          _data/trusty-language-mapping.json
          _data/trusty_language_mapping.yml
+         _data/node_js_versions.yml
        ])
 end
 

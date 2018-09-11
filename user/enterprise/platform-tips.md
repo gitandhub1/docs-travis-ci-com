@@ -309,15 +309,27 @@ Additionally, please the following command to clean up all Docker build images:
 $ sudo docker images | grep travis | awk '{print $3}' | xargs sudo docker rmi -f
 ```
 
-## Integrate Travis CI Enterprise into your monitoring
+## Find out available concurrency
 
-To check if your Travis CI Enterprise installation is up and running, query the `/api/uptime` endpoint of your instance.
+If you wish to find out how much concurrency is available in your Travis CI Enterprise setup, please connect to your platform machine via ssh and follow these steps:
 
 ```
-$ curl -H "Authorization: token XXXXX" https://travis.example.com/api/uptime
+$ travis bash
+root@te-main:/# rabbitmqctl list_consumers -p travis | grep builds.trusty | wc -l
 ```
 
-If everything is up and running, it answers with a `HTTP 200 OK`, or in case of failure with a `HTTP 500 Internal Server Error`.
+The number that's returned here is equal the maximum number of concurrent jobs that are available.
+
+## Find out how many workers are connected
+
+If you wish to find out how many worker machines are currently connected, please connect to your platform machine via ssh and follow these steps:
+
+```
+$ travis bash
+root@te-main:/# rabbitmqctl list_consumers -p travis | grep amq.gen- | wc -l
+```
+
+The number that's returned here is equal the currenctly connected worker machines.
 
 ## Contact Enterprise Support
 

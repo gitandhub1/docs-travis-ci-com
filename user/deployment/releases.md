@@ -103,7 +103,7 @@ If you wish to upload assets to a GitHub Enterprise repository, you must overrid
 http(s)://"GITHUB ENTERPRISE HOSTNAME"/api/v3/
 ```
 
-You can configure this in [Repository Settings](https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-Repository-Settings) or via your `.travis.yml`:
+You can configure this in [Repository Settings](/user/environment-variables/#defining-variables-in-repository-settings) or via your `.travis.yml`:
 
 ```yaml
 env:
@@ -159,7 +159,7 @@ deploy:
 ```
 {: data-file=".travis.yml"}
 
-Please note that all paths in `file` are relative to the current working directory, not to [`$TRAVIS_BUILD_DIR`](/user/environment-variables/#Default-Environment-Variables).
+Please note that all paths in `file` are relative to the current working directory, not to [`$TRAVIS_BUILD_DIR`](/user/environment-variables/#default-environment-variables).
 
 ### Conditional releases
 

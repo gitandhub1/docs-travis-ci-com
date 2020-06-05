@@ -59,7 +59,11 @@ If you depend on these repositories in your build, you can use the following `so
 
 ### Services disabled by default
 
+<<<<<<< HEAD
 On our Xenial infrastructure, to speed up boot time and improve performance we've disabled all services, including the ones that were started by default on Trusty.
+=======
+On our Xenial infrastructure, to speed up boot time and improve performance we've disabled all services, including the ones that are started by default on Trusty.
+>>>>>>> 68602c7038879fcfefb528ed850507cdaad439d4
 Add any services that you want to start by default to your `.travis.yml`:
 
 
